@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Button } from '@material-ui/core';
+import { Card, CardContent, Button , Box , Stepper, Step, StepLabel } from '@material-ui/core';
 import { Form, Field, Formik, FormikConfig, FormikValues } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import './App.css';
@@ -24,13 +24,20 @@ function App() {
           }} onSubmit={() => { }}>
 
 
-          <FormikStep>
-            <Field name='firstname' component={TextField} label='First Name' />
-            <Field name='lastname' component={TextField} label='Last Name' />
-            <Field name='miliniore' type="checkbox"component={CheckboxWithLabel} Label={{ label: 'IM MILIONiore' }} />
+          <FormikStep label='Personal Info'>
+            <Box>
+            <Field fullWidth name='firstname' component={TextField} label='First Name' />
+            </Box>
+            <Box>
+            <Field  fullWidth name='lastname' component={TextField} label='Last Name' />
+            </Box>
+            <Box>
+            <Field name='miliniore' type="checkbox"component={CheckboxWithLabel} Label={{ label: 'IM MILIONIORE' }} />
+            </Box>
+
           </FormikStep>
 
-          <FormikStep  validationSchema={object({
+          <FormikStep label='Money'  validationSchema={object({
             money: mixed().when('miliniore', {
               is: true,
               then: number().required().min(100000, 'you need to have 1 million'),
@@ -38,11 +45,11 @@ function App() {
             })
           })
           }>
-            <Field name='money' type="number" component={TextField} label='money' />
+            <Field  fullWidth name='money' type="number" component={TextField} label='Money' />
           </FormikStep>
 
-          <FormikStep>
-            <Field name='discription' component={TextField} label='discription' />
+          <FormikStep label='Discription'>
+            <Field fullWidth name='Discription' component={TextField} label='Discription' />
           </FormikStep>
 
         </FormikStepper >
@@ -56,7 +63,7 @@ export default App;
 
 export interface FormikStepProps 
 extends Pick<FormikConfig<FormikValues>, 'children' | 'validationSchema' > {
-  // label:string;
+  label:string;
 }
 
 export function FormikStep({ children }: FormikStepProps) {
@@ -67,10 +74,8 @@ export function FormikStep({ children }: FormikStepProps) {
 export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>) {
   const childrenArray = React.Children.toArray(children) as React.ReactElement<FormikStepProps>[];
   const [step, setStep] = useState(0);
-  // const currentChild = childrenArray[step];
-  // console.log(currentChild)
   const currentChild = childrenArray[step] ;
-  console.log('childs',currentChild.props.validationSchema)
+  // console.log('childs',currentChild.props.validationSchema)
 
 
 
@@ -82,6 +87,7 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
   return (
 
     <Formik {...props} 
+
     validationSchema={currentChild.props.validationSchema}
     onSubmit={async (values, helpers) => {
       if (lastStep()) {
@@ -90,10 +96,27 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
         setStep(s => s + 1)
       }
     }}>
-      <Form autoComplete='off'>{currentChild}
+      <Form autoComplete='off'>
 
-        {step > 0 ? <Button onClick={() => setStep(s => s - 1)}> back </Button> : null}
-        <Button type='submit'>{lastStep() ? "Submit" : "Next"}</Button>
+      <Stepper activeStep={step} alternativeLabel>
+        {childrenArray.map((child) => (
+          <Step key={child.props.label}>
+            <StepLabel>{child.props.label}</StepLabel>
+          </Step>
+           ))}
+           </Stepper>
+
+            {currentChild}
+
+            <br/ >
+            <br/ >
+
+
+        {step > 0 ? <Button variant="contained"
+                color="primary" onClick={() => setStep(s => s - 1)}>back</Button> : null}
+
+        <Button variant="contained"
+                 type='submit'>{lastStep() ? "Submit" : "Next"}</Button>
       </Form>
     </Formik>
 
