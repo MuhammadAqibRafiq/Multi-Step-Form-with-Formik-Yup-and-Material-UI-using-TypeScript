@@ -4,7 +4,9 @@ import { Form, Field, Formik, FormikConfig, FormikValues } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import './App.css';
 import { number, object, mixed } from 'yup';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 
+const sleep = (time: number | undefined) => new Promise((acc) => setTimeout(acc, time));
 
 function App() {
 
@@ -21,7 +23,10 @@ function App() {
             miliniore: false,
             money: 0,
             discription: ''
-          }} onSubmit={() => { }}>
+          }} onSubmit={async (values) => {
+            await sleep(3000);
+            console.log('values', values);
+          }}>
 
 
           <FormikStep label='Personal Info'>
@@ -96,6 +101,9 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
         setStep(s => s + 1)
       }
     }}>
+
+      {({isSubmitting })=>(
+
       <Form autoComplete='off'>
 
       <Stepper activeStep={step} alternativeLabel>
@@ -111,13 +119,14 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
             <br/ >
             <br/ >
 
-
-        {step > 0 ? <Button variant="contained"
+        {step > 0 ? <Button variant="contained" disabled={isSubmitting}
                 color="primary" onClick={() => setStep(s => s - 1)}>back</Button> : null}
 
-        <Button variant="contained"
-                 type='submit'>{lastStep() ? "Submit" : "Next"}</Button>
+        <Button variant="contained"  disabled={isSubmitting}
+        startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
+                 type='submit'>{isSubmitting ? 'Submitting' : lastStep() ? "Submit" : "Next"}</Button>
       </Form>
+      )}
     </Formik>
 
 
