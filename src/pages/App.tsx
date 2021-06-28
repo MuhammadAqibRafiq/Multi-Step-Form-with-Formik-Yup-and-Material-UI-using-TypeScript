@@ -80,6 +80,7 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
   const childrenArray = React.Children.toArray(children) as React.ReactElement<FormikStepProps>[];
   const [step, setStep] = useState(0);
   const currentChild = childrenArray[step] ;
+  const [completed, setCompleted] = useState(false);
   // console.log('childs',currentChild.props.validationSchema)
 
 
@@ -97,6 +98,7 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
     onSubmit={async (values, helpers) => {
       if (lastStep()) {
         await props.onSubmit(values, helpers)
+        setCompleted(true);
       } else {
         setStep(s => s + 1)
       }
@@ -107,8 +109,8 @@ export function FormikStepper({ children, ...props }: FormikConfig<FormikValues>
       <Form autoComplete='off'>
 
       <Stepper activeStep={step} alternativeLabel>
-        {childrenArray.map((child) => (
-          <Step key={child.props.label}>
+        {childrenArray.map((child,index) => (
+          <Step key={child.props.label}  completed={step > index || completed} >
             <StepLabel>{child.props.label}</StepLabel>
           </Step>
            ))}
